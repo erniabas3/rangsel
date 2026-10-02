@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mengenal Sendi Tubuh Kita - Kelas 6 MI</title>
+    <!-- Tailwind CSS via CDN for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom configuration for Tailwind to match requested colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kemenagBlue: '#003366', // Dark blue
+                        kemenagGold: '#D4AF37', // Gold
+                        lightBlue: '#E6F0FA',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+
+        h1, h2, h3, .title-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+
+        /* Hide elements for interactivity */
+        .hidden { display: none !important; }
+
+        /* Animation classes */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Drag and Drop styling */
+        .draggable {
+            cursor: grab;
+            transition: transform 0.2s;
+        }
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+        .dropzone {
+            border: 2px dashed #D4AF37;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .dropzone.dragover {
+            background-color: #E6F0FA;
+            border-color: #003366;
+            border-style: solid;
+        }
+        
+        /* Interactive Joint Visualizer */
+        .joint-model {
+            width: 150px;
+            height: 150px;
+            background-color: white;
+            border-radius: 50%;
+            border: 4px solid #003366;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin: 0 auto;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Joint Specific Animations via CSS */
+        .bone-base {
+            background-color: #e5e7eb;
+            border: 2px solid #9ca3af;
+            border-radius: 10px;
+            position: absolute;
+        }
+        
+        /* Engsel (Hinge) */
+        .anim-engsel .bone-1 { width: 40px; height: 80px; bottom: 10px; left: 55px; }
+        .anim-engsel .bone-2 { width: 40px; height: 80px; top: 10px; left: 55px; transform-origin: bottom center; transition: transform 0.3s; }
+        
+        /* Peluru (Ball and Socket) */
+        .anim-peluru .socket { width: 80px; height: 40px; border-radius: 0 0 40px 40px; background: #e5e7eb; border: 2px solid #9ca3af; top: 20px; position: absolute; }
+        .anim-peluru .ball { width: 50px; height: 50px; border-radius: 50%; background: #d1d5db; border: 2px solid #9ca3af; top: 35px; position: absolute; transition: transform 0.3s; }
+        .anim-peluru .bone { width: 20px; height: 60px; top: 75px; position: absolute; background: #e5e7eb; border: 2px solid #9ca3af; border-radius: 10px; transition: transform 0.3s; transform-origin: top center; }
+        
+        /* Putar (Pivot) */
+        .anim-putar .ring { width: 60px; height: 20px; border-radius: 30px; border: 4px solid #9ca3af; top: 65px; position: absolute; z-index: 2; }
+        .anim-putar .peg { width: 30px; height: 100px; background: #e5e7eb; border: 2px solid #9ca3af; border-radius: 15px; top: 25px; position: absolute; transition: transform 0.3s; }
+
+        /* Geser (Gliding) */
+        .anim-geser .plate-1 { width: 80px; height: 30px; background: #e5e7eb; border: 2px solid #9ca3af; top: 40px; position: absolute; transition: transform 0.3s; }
+        .anim-geser .plate-2 { width: 80px; height: 30px; background: #d1d5db; border: 2px solid #9ca3af; top: 80px; position: absolute; }
+
+        /* Pelana (Saddle) */
+        .anim-pelana .saddle-1 { width: 60px; height: 40px; background: #e5e7eb; border: 2px solid #9ca3af; border-radius: 10px 10px 40px 40px; top: 30px; position: absolute; }
+        .anim-pelana .saddle-2 { width: 40px; height: 60px; background: #d1d5db; border: 2px solid #9ca3af; border-radius: 30px 30px 10px 10px; top: 50px; position: absolute; transition: transform 0.3s; transform-origin: top center;}
+
+
+        /* Slider styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #D4AF37;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #003366;
+            border-radius: 4px;
+        }
+        
+        .quiz-option {
+            transition: all 0.2s;
+        }
+        .quiz-option:hover:not(:disabled) {
+            transform: scale(1.02);
+            border-color: #D4AF37;
+        }
+        .quiz-option.selected {
+            background-color: #E6F0FA;
+            border-color: #003366;
+        }
+        .quiz-option.correct {
+            background-color: #d1fae5; /* green-100 */
+            border-color: #10b981; /* green-500 */
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <nav class="bg-kemenagBlue text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <!-- Fallback icon if image fails -->
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-kemenagBlue font-bold text-xl border-2 border-kemenagGold shadow-sm">MI</div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wider text-kemenagGold">IPA KELAS VI</h1>
+                    <p class="text-xs text-blue-200">Kanwil Kemenag Prov. Gorontalo</p>
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#materi" class="hover:text-kemenagGold transition font-semibold">Materi</a>
+                <a href="#eksplorasi" class="hover:text-kemenagGold transition font-semibold">Eksplorasi</a>
+                <a href="#kuis" class="hover:text-kemenagGold transition font-semibold">Kuis</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-lightBlue border-b-4 border-kemenagGold py-12 md:py-20 text-center px-4">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold text-kemenagBlue mb-4 title-font">Mengenal Jenis-Jenis Sendi</h1>
+            <p class="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
+                Halo anak-anak madrasah hebat! Pernahkah kamu membayangkan bagaimana tanganmu bisa melempar bola takraw, atau kakimu bisa melangkah mendaki perbukitan Gorontalo? Semua gerakan itu dibantu oleh "Sendi"!
+            </p>
+            <a href="#materi" class="inline-block bg-kemenagGold hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:-translate-y-1 text-lg">
+                Ayo Mulai Belajar!
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-16">
+
+        <section id="materi" class="scroll-mt-24">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 bg-kemenagBlue rounded-full flex items-center justify-center text-white text-2xl font-bold">1</div>
+                <h2 class="text-3xl font-bold text-kemenagBlue title-font">Apa itu Sendi?</h2>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6 md:p-8 border-l-8 border-kemenagGold relative overflow-hidden">
+                <!-- Decorative element -->
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-yellow-100 rounded-full opacity-50"></div>
+                
+                <p class="text-lg leading-relaxed mb-4 relative z-10">
+                    Tulang-tulang di dalam tubuh kita saling bersambungan lho! Tempat bertemunya dua tulang atau lebih disebut <strong>Sendi</strong>. 
+                    Ibarat engsel pada pintu rumah atau gerbang madrasahmu, sendilah yang membuat tulang kita tidak kaku dan bisa digerakkan.
+                </p>
+                <p class="text-lg leading-relaxed relative z-10">
+                    Berdasarkan arah geraknya, sendi yang bisa digerakkan dengan bebas (Diartrosis) dibagi menjadi beberapa jenis utama. Mari kita pelajari bersama!
+                </p>
+            </div>
+        </section>
+
+        <section id="eksplorasi" class="scroll-mt-24">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 bg-kemenagBlue rounded-full flex items-center justify-center text-white text-2xl font-bold">2</div>
+                <h2 class="text-3xl font-bold text-kemenagBlue title-font">Laboratorium Gerak (Eksplorasi)</h2>
+            </div>
+            
+            <p class="text-gray-600 mb-6 text-lg">Pilih jenis sendi, lalu <strong>geser slider (penggeser)</strong> di bawahnya untuk melihat bagaimana tulang tersebut bergerak!</p>
+
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-3">
+                    <!-- Sidebar for selecting joints -->
+                    <div class="bg-lightBlue p-4 border-r border-gray-200 flex flex-row md:flex-col gap-2 overflow-x-auto">
+                        <button onclick="selectJoint('engsel')" id="btn-engsel" class="w-full text-left px-4 py-3 rounded-lg font-bold transition joint-btn bg-kemenagBlue text-white shadow-md">Sendi Engsel</button>
+                        <button onclick="selectJoint('peluru')" id="btn-peluru" class="w-full text-left px-4 py-3 rounded-lg font-bold transition joint-btn bg-white text-gray-700 hover:bg-blue-50">Sendi Peluru</button>
+                        <button onclick="selectJoint('putar')" id="btn-putar" class="w-full text-left px-4 py-3 rounded-lg font-bold transition joint-btn bg-white text-gray-700 hover:bg-blue-50">Sendi Putar</button>
+                        <button onclick="selectJoint('pelana')" id="btn-pelana" class="w-full text-left px-4 py-3 rounded-lg font-bold transition joint-btn bg-white text-gray-700 hover:bg-blue-50">Sendi Pelana</button>
+                        <button onclick="selectJoint('geser')" id="btn-geser" class="w-full text-left px-4 py-3 rounded-lg font-bold transition joint-btn bg-white text-gray-700 hover:bg-blue-50">Sendi Geser</button>
+                    </div>
+                    
+                    <!-- Main visualizer area -->
+                    <div class="col-span-1 md:col-span-2 p-6 md:p-8 flex flex-col items-center justify-center">
+                        <h3 id="joint-title" class="text-2xl font-bold text-kemenagBlue mb-2 title-font text-center">Sendi Engsel</h3>
+                        <p id="joint-desc" class="text-gray-600 text-center mb-8 h-16">Memungkinkan gerakan satu arah, seperti pintu yang dibuka tutup.</p>
+                        
+                        <!-- Visual Model Area -->
+                        <div id="model-container" class="joint-model mb-8 anim-engsel">
+                            <!-- Elements for Engsel -->
+                            <div class="bone-base bone-1 id-engsel"></div>
+                            <div class="bone-base bone-2 id-engsel" id="move-engsel"></div>
+                            
+                            <!-- Elements for Peluru (Hidden initially) -->
+                            <div class="socket id-peluru hidden"></div>
+                            <div class="ball id-peluru hidden" id="move-peluru-1"></div>
+                            <div class="bone id-peluru hidden" id="move-peluru-2"></div>
+
+                            <!-- Elements for Putar (Hidden initially) -->
+                            <div class="ring id-putar hidden"></div>
+                            <div class="peg id-putar hidden" id="move-putar"></div>
+
+                            <!-- Elements for Geser (Hidden initially) -->
+                            <div class="plate-1 id-geser hidden" id="move-geser"></div>
+                            <div class="plate-2 id-geser hidden"></div>
+
+                            <!-- Elements for Pelana (Hidden initially) -->
+                            <div class="saddle-1 id-pelana hidden"></div>
+                            <div class="saddle-2 id-pelana hidden" id="move-pelana"></div>
+                        </div>
+
+                        <!-- Interaction Control -->
+                        <div class="w-full max-w-sm bg-gray-50 p-4 rounded-xl border border-gray-200">
+                            <label for="joint-slider" class="block text-sm font-bold text-gray-700 mb-2 text-center">Gerakkan Aku!</label>
+                            <input type="range" id="joint-slider" min="0" max="100" value="50" oninput="animateJoint(this.value)">
+                        </div>
+
+                        <!-- Educational Feedback / Example -->
+                        <div class="mt-6 p-4 bg-yellow-50 border border-kemenagGold rounded-lg w-full">
+                            <p class="font-bold text-kemenagBlue mb-1"><span class="text-xl mr-2">💡</span>Contoh di Tubuh Kita:</p>
+                            <p id="joint-example" class="text-gray-800">Siku lengan dan lutut kakimu. Coba tekuk tanganmu, itu kerja sendi engsel!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-24">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 bg-kemenagBlue rounded-full flex items-center justify-center text-white text-2xl font-bold">3</div>
+                <h2 class="text-3xl font-bold text-kemenagBlue title-font">Tantangan Mencocokkan!</h2>
+            </div>
+            
+            <p class="text-gray-600 mb-6 text-lg">Ayo uji pemahamanmu. Tarik (drag) kotak jenis sendi di bawah, lalu lepaskan (drop) ke bagian tubuh yang tepat!</p>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                <!-- Draggable Items -->
+                <div class="flex flex-wrap gap-4 mb-8 justify-center p-4 bg-lightBlue rounded-xl" id="drag-container">
+                    <div class="draggable bg-white border-2 border-kemenagBlue text-kemenagBlue font-bold py-2 px-6 rounded-full shadow cursor-grab" draggable="true" ondragstart="drag(event)" id="drag-putar" data-type="putar">Sendi Putar</div>
+                    <div class="draggable bg-white border-2 border-kemenagBlue text-kemenagBlue font-bold py-2 px-6 rounded-full shadow cursor-grab" draggable="true" ondragstart="drag(event)" id="drag-peluru" data-type="peluru">Sendi Peluru</div>
+                    <div class="draggable bg-white border-2 border-kemenagBlue text-kemenagBlue font-bold py-2 px-6 rounded-full shadow cursor-grab" draggable="true" ondragstart="drag(event)" id="drag-engsel" data-type="engsel">Sendi Engsel</div>
+                    <div class="draggable bg-white border-2 border-kemenagBlue text-kemenagBlue font-bold py-2 px-6 rounded-full shadow cursor-grab" draggable="true" ondragstart="drag(event)" id="drag-pelana" data-type="pelana">Sendi Pelana</div>
+                </div>
+
+                <!-- Drop Zones (Human Body Representation) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <div class="border rounded-xl p-4 flex flex-col items-center bg-gray-50">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-3xl mb-2">👤</div>
+                        <h4 class="font-bold text-gray-700 mb-2">Pangkal Leher</h4>
+                        <p class="text-xs text-center text-gray-500 mb-3 h-8">Menghubungkan tengkorak dengan tulang leher pertama.</p>
+                        <div class="dropzone w-full h-16 rounded-lg flex items-center justify-center text-gray-400 font-semibold" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" data-accept="putar">
+                            Letakkan di sini
+                        </div>
+                    </div>
+
+                    <div class="border rounded-xl p-4 flex flex-col items-center bg-gray-50">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-3xl mb-2">💪</div>
+                        <h4 class="font-bold text-gray-700 mb-2">Pangkal Lengan</h4>
+                        <p class="text-xs text-center text-gray-500 mb-3 h-8">Antara tulang lengan atas dan gelang bahu.</p>
+                        <div class="dropzone w-full h-16 rounded-lg flex items-center justify-center text-gray-400 font-semibold" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" data-accept="peluru">
+                            Letakkan di sini
+                        </div>
+                    </div>
+
+                    <div class="border rounded-xl p-4 flex flex-col items-center bg-gray-50">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-3xl mb-2">🦵</div>
+                        <h4 class="font-bold text-gray-700 mb-2">Lutut Kaki</h4>
+                        <p class="text-xs text-center text-gray-500 mb-3 h-8">Antara tulang paha dan tulang kering.</p>
+                        <div class="dropzone w-full h-16 rounded-lg flex items-center justify-center text-gray-400 font-semibold" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" data-accept="engsel">
+                            Letakkan di sini
+                        </div>
+                    </div>
+
+                    <div class="border rounded-xl p-4 flex flex-col items-center bg-gray-50">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-3xl mb-2">👍</div>
+                        <h4 class="font-bold text-gray-700 mb-2">Pangkal Ibu Jari</h4>
+                        <p class="text-xs text-center text-gray-500 mb-3 h-8">Tulang pangkal ibu jari dan tulang telapak tangan.</p>
+                        <div class="dropzone w-full h-16 rounded-lg flex items-center justify-center text-gray-400 font-semibold" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" data-accept="pelana">
+                            Letakkan di sini
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div id="drag-feedback" class="mt-6 text-center font-bold hidden p-3 rounded-lg">
+                    <!-- Feedback text goes here -->
+                </div>
+            </div>
+        </section>
+
+        <section id="kuis" class="scroll-mt-24 mb-16">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 bg-kemenagBlue rounded-full flex items-center justify-center text-white text-2xl font-bold">4</div>
+                <h2 class="text-3xl font-bold text-kemenagBlue title-font">Kuis Evaluasi Formatif</h2>
+            </div>
+            
+            <div id="quiz-intro" class="bg-white rounded-2xl shadow-lg p-8 text-center border-t-8 border-kemenagBlue">
+                <h3 class="text-2xl font-bold mb-4">Siap Menguji Pengetahuanmu?</h3>
+                <p class="text-gray-600 mb-6">Kuis ini terdiri dari 5 soal pilihan ganda. Jangan terburu-buru, baca soal dengan teliti. Selamat mengerjakan!</p>
+                <button onclick="startQuiz()" class="bg-kemenagBlue hover:bg-blue-800 text-white font-bold py-3 px-10 rounded-full shadow-lg transition text-lg">
+                    Mulai Kuis
+                </button>
+            </div>
+
+            <div id="quiz-container" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-200 hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <span id="quiz-progress" class="bg-lightBlue text-kemenagBlue font-bold py-1 px-4 rounded-full text-sm">Soal 1 dari 5</span>
+                    <span class="text-gray-500 text-sm">Nilai: <span id="quiz-score-display" class="font-bold text-kemenagGold">0</span></span>
+                </div>
+                
+                <h3 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 mb-6">
+                    Pertanyaan muncul di sini?
+                </h3>
+                
+                <div id="options-container" class="space-y-3 mb-6">
+                    <!-- Options injected via JS -->
+                </div>
+
+                <div id="feedback-container" class="hidden p-4 rounded-lg mb-6 border">
+                    <p id="feedback-title" class="font-bold text-lg mb-1"></p>
+                    <p id="feedback-text" class="text-gray-700"></p>
+                </div>
+
+                <div class="flex justify-end">
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden bg-kemenagGold hover:bg-yellow-600 text-white font-bold py-2 px-8 rounded-lg shadow transition">
+                        Selanjutnya ➔
+                    </button>
+                    <button id="finish-btn" onclick="showResults()" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-8 rounded-lg shadow transition">
+                        Lihat Hasil 🏆
+                    </button>
+                </div>
+            </div>
+
+            <div id="result-container" class="bg-white rounded-2xl shadow-lg p-8 text-center border-t-8 border-kemenagGold hidden">
+                <div class="text-6xl mb-4" id="result-icon">🎓</div>
+                <h3 class="text-3xl font-bold text-kemenagBlue mb-2">Kerja Bagus!</h3>
+                <p class="text-gray-600 mb-6">Kamu telah menyelesaikan kuis evaluasi materi sendi.</p>
+                
+                <div class="inline-block bg-lightBlue rounded-2xl p-6 mb-8">
+                    <p class="text-sm text-gray-500 font-bold uppercase tracking-wide mb-1">Skor Akhir Kamu</p>
+                    <p id="final-score" class="text-5xl font-extrabold text-kemenagBlue">100</p>
+                </div>
+                
+                <div id="result-message" class="text-lg mb-8 p-4 rounded-lg bg-gray-50 border">
+                    <!-- Dynamic message based on score -->
+                </div>
+
+                <button onclick="resetQuiz()" class="bg-kemenagBlue hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-full shadow transition">
+                    Ulangi Belajar
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-kemenagBlue text-white py-6 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-sm text-blue-200">
+                &copy; 2026 - Modul Pembelajaran Interaktif (MPI) IPA MI Kelas VI<br>
+                Dirancang khusus untuk pembelajaran offline mandiri | Kanwil Kemenag Prov. Gorontalo
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        /* === INTERACTIVE JOINT VISUALIZER LOGIC === */
+        
+        const jointData = {
+            engsel: {
+                title: "Sendi Engsel",
+                desc: "Hanya memungkinkan gerakan satu arah saja, seperti engsel pada pintu.",
+                example: "Siku pada lengan, lutut pada kaki, dan ruas-ruas jari. Coba luruskan dan tekuk tanganmu, itulah kerja sendi engsel!"
+            },
+            peluru: {
+                title: "Sendi Peluru",
+                desc: "Memungkinkan gerakan ke segala arah. Ujung tulang yang satu berbentuk bola, masuk ke tulang lain yang berbentuk mangkuk.",
+                example: "Pangkal lengan (bahu) dan pangkal paha (pinggul). Saat bermain bulutangkis dan memutar lengan, kamu memakai sendi ini."
+            },
+            putar: {
+                title: "Sendi Putar",
+                desc: "Memungkinkan gerakan memutar. Tulang yang satu berputar mengelilingi tulang yang lain sebagai poros.",
+                example: "Pertemuan tulang leher pertama dan tengkorak. Cobalah menggelengkan kepalamu ke kiri dan kanan."
+            },
+            pelana: {
+                title: "Sendi Pelana",
+                desc: "Memungkinkan gerakan ke dua arah, seperti orang menunggang kuda (ke depan-belakang dan ke samping).",
+                example: "Pangkal ibu jarimu. Coba putar dan gerakkan ibu jarimu saat memegang pulpen."
+            },
+            geser: {
+                title: "Sendi Geser",
+                desc: "Hanya memungkinkan sedikit gerakan bergeser pada bidang datar.",
+                example: "Tulang-tulang pergelangan tangan dan pergelangan kaki, serta di antara tulang belakang."
+            }
+        };
+
+        let currentJoint = 'engsel';
+
+        function selectJoint(type) {
+            currentJoint = type;
+            const data = jointData[type];
+            
+            // Update Text
+            document.getElementById('joint-title').innerText = data.title;
+            document.getElementById('joint-desc').innerText = data.desc;
+            document.getElementById('joint-example').innerText = data.example;
+
+            // Reset Slider
+            const slider = document.getElementById('joint-slider');
+            slider.value = 50;
+            animateJoint(50); // Reset visual position
+
+            // Update Buttons Styling
+            document.querySelectorAll('.joint-btn').forEach(btn => {
+                btn.classList.remove('bg-kemenagBlue', 'text-white', 'shadow-md');
+                btn.classList.add('bg-white', 'text-gray-700');
+            });
+            const activeBtn = document.getElementById(`btn-${type}`);
+            activeBtn.classList.remove('bg-white', 'text-gray-700');
+            activeBtn.classList.add('bg-kemenagBlue', 'text-white', 'shadow-md');
+
+            // Update Visualizer container class
+            const container = document.getElementById('model-container');
+            container.className = `joint-model mb-8 anim-${type}`;
+
+            // Hide all elements
+            document.querySelectorAll('.bone-base, .socket, .ball, .bone, .ring, .peg, .plate-1, .plate-2, .saddle-1, .saddle-2').forEach(el => {
+                el.classList.add('hidden');
+            });
+
+            // Show elements for selected joint
+            document.querySelectorAll(`.id-${type}`).forEach(el => {
+                el.classList.remove('hidden');
+            });
+        }
+
+        function animateJoint(val) {
+            // value is 0 to 100
+            const percentage = (val - 50) / 50; // -1 to 1
+
+            switch(currentJoint) {
+                case 'engsel':
+                    // Rotate 0 to 135 degrees. Value 0-100 maps to 0-135.
+                    // When slider is 0 -> 0 deg, 50 -> 67.5, 100 -> 135
+                    const engselAngle = (val / 100) * 135;
+                    document.getElementById('move-engsel').style.transform = `rotate(${engselAngle}deg)`;
+                    break;
+                case 'peluru':
+                    // Rotate and swing
+                    const swingAngle = percentage * 45; // -45 to 45
+                    const rotateBall = percentage * 90;
+                    document.getElementById('move-peluru-1').style.transform = `rotate(${rotateBall}deg)`;
+                    document.getElementById('move-peluru-2').style.transform = `rotate(${swingAngle}deg)`;
+                    break;
+                case 'putar':
+                    // Rotate on Y axis (simulated with 2D rotation for simplicity here)
+                    const putarAngle = percentage * 90;
+                    document.getElementById('move-putar').style.transform = `rotate(${putarAngle}deg)`;
+                    break;
+                case 'geser':
+                    // Translate X
+                    const geserX = percentage * 15; // -15px to 15px
+                    document.getElementById('move-geser').style.transform = `translateX(${geserX}px)`;
+                    break;
+                case 'pelana':
+                    // Swing left right
+                    const pelanaAngle = percentage * 30;
+                    document.getElementById('move-pelana').style.transform = `rotate(${pelanaAngle}deg)`;
+                    break;
+            }
+        }
+
+        /* === DRAG AND DROP LOGIC === */
+        
+        let draggedItem = null;
+
+        function drag(ev) {
+            draggedItem = ev.target;
+            ev.dataTransfer.setData("text", ev.target.id);
+            // Slight delay to allow visual drag
+            setTimeout(() => {
+                ev.target.style.opacity = "0.4";
+            }, 0);
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function dragEnter(ev) {
+            ev.preventDefault();
+            if (ev.currentTarget.classList.contains('dropzone')) {
+                ev.currentTarget.classList.add('dragover');
+            }
+        }
+
+        function dragLeave(ev) {
+            if (ev.currentTarget.classList.contains('dropzone')) {
+                ev.currentTarget.classList.remove('dragover');
+            }
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const targetZone = ev.currentTarget;
+            targetZone.classList.remove('dragover');
+            
+            if (draggedItem) {
+                draggedItem.style.opacity = "1";
+                
+                const expectedType = targetZone.getAttribute('data-accept');
+                const draggedType = draggedItem.getAttribute('data-type');
+                const feedbackEl = document.getElementById('drag-feedback');
+
+                // Check if dropzone is empty
+                if (targetZone.children.length > 0 && targetZone.innerHTML !== "Letakkan di sini") {
+                     feedbackEl.innerHTML = "❌ Tempat ini sudah terisi. Pindahkan item yang ada dulu.";
+                     feedbackEl.className = "mt-6 text-center font-bold p-3 rounded-lg bg-yellow-100 text-yellow-800 border border-yellow-300 block fade-in";
+                     return;
+                }
+
+                if (expectedType === draggedType) {
+                    // Correct!
+                    targetZone.innerHTML = '';
+                    targetZone.appendChild(draggedItem);
+                    targetZone.style.borderColor = "#10b981"; // Green
+                    targetZone.style.backgroundColor = "#d1fae5";
+                    
+                    feedbackEl.innerHTML = "✅ Hebat! Posisinya tepat sekali.";
+                    feedbackEl.className = "mt-6 text-center font-bold p-3 rounded-lg bg-green-100 text-green-800 border border-green-300 block fade-in";
+                    
+                    // Check if all done
+                    if(document.getElementById('drag-container').children.length === 0) {
+                        setTimeout(()=>{
+                            feedbackEl.innerHTML = "🎉 Luar Biasa! Kamu berhasil mencocokkan semua jenis sendi!";
+                            feedbackEl.className = "mt-6 text-center font-bold p-3 rounded-lg bg-blue-100 text-kemenagBlue border border-kemenagBlue block fade-in";
+                        }, 1000);
+                    }
+                } else {
+                    // Incorrect, return to container
+                    document.getElementById('drag-container').appendChild(draggedItem);
+                    
+                    // Educational feedback based on mistake
+                    let hint = "Coba lagi.";
+                    if (draggedType === 'engsel') hint = "Ingat, sendi engsel bergerak satu arah seperti pintu, contohnya di lutut atau siku.";
+                    if (draggedType === 'peluru') hint = "Sendi peluru bisa bergerak bebas ke segala arah, contohnya di pangkal lengan (bahu).";
+                    if (draggedType === 'putar') hint = "Sendi putar membuat kita bisa menggeleng, letaknya di pangkal leher.";
+                    if (draggedType === 'pelana') hint = "Sendi pelana bergerak dua arah, letaknya di pangkal ibu jari.";
+
+                    feedbackEl.innerHTML = `❌ Kurang tepat. ${hint}`;
+                    feedbackEl.className = "mt-6 text-center font-bold p-3 rounded-lg bg-red-100 text-red-800 border border-red-300 block fade-in";
+                }
+                draggedItem = null;
+            }
+        }
+
+        // Handle end drag outside
+        document.addEventListener('dragend', function(ev) {
+            if(draggedItem) {
+                draggedItem.style.opacity = "1";
+            }
+        });
+
+        /* === QUIZ LOGIC === */
+        
+        const quizData = [
+            {
+                question: "Saat bermain kasti di halaman madrasah, Budi melempar bola dengan mengayunkan lengannya memutar ke segala arah. Sendi apakah yang bekerja paling keras pada pangkal lengannya?",
+                options: [
+                    "Sendi Engsel",
+                    "Sendi Peluru",
+                    "Sendi Pelana",
+                    "Sendi Putar"
+                ],
+                correct: 1, // Index of correct option
+                explanation: "Tepat! Sendi peluru terletak pada pangkal lengan (bahu) dan memungkinkan gerakan ke segala arah, sehingga Budi bisa mengayunkan lengannya memutar."
+            },
+            {
+                question: "Siti kesulitan menekuk lututnya setelah terjatuh. Lutut merupakan bagian tubuh yang memiliki sendi yang cara kerjanya mirip dengan...",
+                options: [
+                    "Orang yang menunggang kuda",
+                    "Engsel pada jendela atau pintu kelas",
+                    "Gasing yang berputar pada porosnya",
+                    "Ulekan pada cobek batu"
+                ],
+                correct: 1,
+                explanation: "Benar sekali. Lutut memiliki Sendi Engsel, yang hanya bisa digerakkan satu arah (ditekuk dan diluruskan), persis seperti engsel pintu."
+            },
+            {
+                question: "Ketika Ustadz memanggil dari belakang, kamu secara refleks menengok ke belakang. Gerakan leher saat menengok ini dimungkinkan oleh adanya...",
+                options: [
+                    "Sendi Geser",
+                    "Sendi Peluru",
+                    "Sendi Putar",
+                    "Sendi Pelana"
+                ],
+                correct: 2,
+                explanation: "Betul! Tulang leher pertama dan tengkorak dihubungkan oleh Sendi Putar, yang memungkinkan kepala kita berputar menengok ke kanan atau kiri."
+            },
+            {
+                question: "Manakah pasangan antara jenis sendi dan letaknya yang PALING TEPAT?",
+                options: [
+                    "Sendi Pelana - Terdapat pada pangkal paha",
+                    "Sendi Engsel - Terdapat pada siku dan lutut",
+                    "Sendi Putar - Terdapat pada pergelangan kaki",
+                    "Sendi Geser - Terdapat pada pangkal lengan"
+                ],
+                correct: 1,
+                explanation: "Tepat! Sendi engsel memang terdapat pada siku dan lutut. (Pangkal paha=peluru, Pergelangan kaki=geser, Pangkal lengan=peluru)."
+            },
+            {
+                question: "Fungsi utama sendi bagi tubuh manusia adalah...",
+                options: [
+                    "Menghasilkan sel darah merah dan putih",
+                    "Menghubungkan antar tulang agar mudah digerakkan",
+                    "Memberikan bentuk tubuh agar tegak",
+                    "Melindungi organ tubuh bagian dalam seperti jantung"
+                ],
+                correct: 1,
+                explanation: "Benar! Fungsi utama sendi adalah menghubungkan dua tulang atau lebih sehingga rangka tubuh kita tidak kaku dan bisa digerakkan."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        function startQuiz() {
+            document.getElementById('quiz-intro').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isAnswered = false;
+            const q = quizData[currentQuestionIndex];
+            
+            document.getElementById('quiz-progress').innerText = `Soal ${currentQuestionIndex + 1} dari ${quizData.length}`;
+            document.getElementById('question-text').innerText = q.question;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option w-full text-left p-4 rounded-xl border-2 border-gray-200 font-semibold text-gray-700 bg-gray-50';
+                btn.innerHTML = `<span class="inline-block w-8 h-8 bg-white border border-gray-300 rounded-full text-center leading-8 mr-3 font-bold">${String.fromCharCode(65 + index)}</span> ${opt}`;
+                btn.onclick = () => selectAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Hide feedback & buttons
+            document.getElementById('feedback-container').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('finish-btn').classList.add('hidden');
+        }
+
+        function selectAnswer(selectedIndex, btnElement) {
+            if (isAnswered) return; // Prevent multiple clicks
+            isAnswered = true;
+
+            const q = quizData[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.quiz-option');
+            
+            // Disable all buttons
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.cursor = 'default';
+            });
+
+            const feedbackContainer = document.getElementById('feedback-container');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackText = document.getElementById('feedback-text');
+            feedbackContainer.classList.remove('hidden');
+            feedbackContainer.classList.add('fade-in');
+
+            if (selectedIndex === q.correct) {
+                // Correct
+                btnElement.classList.add('correct');
+                score += 20; // 5 questions, 20 pts each
+                document.getElementById('quiz-score-display').innerText = score;
+                
+                feedbackContainer.className = 'p-4 rounded-lg mb-6 border bg-green-50 border-green-300 text-green-900 fade-in';
+                feedbackTitle.innerHTML = '✅ Jawaban Kamu Benar!';
+            } else {
+                // Incorrect
+                btnElement.classList.add('incorrect');
+                buttons[q.correct].classList.add('correct'); // Show correct answer
+                
+                feedbackContainer.className = 'p-4 rounded-lg mb-6 border bg-red-50 border-red-300 text-red-900 fade-in';
+                feedbackTitle.innerHTML = '❌ Jawaban Kurang Tepat.';
+            }
+
+            // Show explanation
+            feedbackText.innerHTML = q.explanation;
+
+            // Show Next or Finish button
+            if (currentQuestionIndex < quizData.length - 1) {
+                document.getElementById('next-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('finish-btn').classList.remove('hidden');
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('result-container').classList.remove('hidden');
+            document.getElementById('result-container').classList.add('fade-in');
+            
+            document.getElementById('final-score').innerText = score;
+            
+            const msgEl = document.getElementById('result-message');
+            let icon = '🎓';
+            if (score === 100) {
+                msgEl.innerHTML = "<strong>Mumtaz (Sempurna)!</strong> Pemahamanmu tentang sendi sudah sangat luar biasa bak ilmuwan. Pertahankan!";
+                msgEl.className = "text-lg mb-8 p-4 rounded-lg bg-green-100 border border-green-300 text-green-800";
+                icon = '🏆';
+            } else if (score >= 60) {
+                msgEl.innerHTML = "<strong>Jayyid Jiddan (Sangat Baik)!</strong> Kamu sudah memahami sebagian besar materi. Sedikit lagi mengulang, pasti lebih hebat.";
+                msgEl.className = "text-lg mb-8 p-4 rounded-lg bg-blue-100 border border-blue-300 text-blue-800";
+                icon = '👍';
+            } else {
+                msgEl.innerHTML = "<strong>Tetap Semangat!</strong> Ayo baca lagi materinya dan coba simulasi geraknya pelan-pelan. Belajar itu proses, kamu pasti bisa!";
+                msgEl.className = "text-lg mb-8 p-4 rounded-lg bg-yellow-100 border border-yellow-300 text-yellow-800";
+                icon = '💪';
+            }
+            document.getElementById('result-icon').innerText = icon;
+        }
+
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById('quiz-score-display').innerText = '0';
+            
+            document.getElementById('result-container').classList.add('hidden');
+            document.getElementById('quiz-intro').classList.remove('hidden');
+            
+            // Scroll to top of quiz section smoothly
+            document.getElementById('kuis').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize first joint on load
+        window.onload = () => {
+            selectJoint('engsel');
+        };
+
+    </script>
+</body>
+</html>
